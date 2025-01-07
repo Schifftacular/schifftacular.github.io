@@ -115,25 +115,46 @@
     <script>
         const pdfList = document.getElementById('pdfList');
 
+        // Load PDFs from local storage on page load
+        window.onload = () => {
+            const savedPDFs = JSON.parse(localStorage.getItem('pdfs')) || [];
+            savedPDFs.forEach(file => {
+                addPDFToList(file.name, file.url);
+            });
+        };
+
         function uploadPDF() {
             const input = document.getElementById('pdfInput');
             const file = input.files[0];
 
             if (file && file.type === 'application/pdf') {
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
+                const fileURL = URL.createObjectURL(file);
+                const fileName = file.name;
 
-                link.href = URL.createObjectURL(file);
-                link.textContent = file.name;
-                link.target = '_blank';
+                // Save file info to local storage
+                const savedPDFs = JSON.parse(localStorage.getItem('pdfs')) || [];
+                savedPDFs.push({ name: fileName, url: fileURL });
+                localStorage.setItem('pdfs', JSON.stringify(savedPDFs));
 
-                listItem.appendChild(link);
-                pdfList.appendChild(listItem);
+                // Add to list
+                addPDFToList(fileName, fileURL);
 
                 input.value = ''; // Clear the input after upload
             } else {
                 alert('Please upload a valid PDF file.');
             }
+        }
+
+        function addPDFToList(name, url) {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.textContent = name;
+            link.target = '_blank';
+
+            listItem.appendChild(link);
+            pdfList.appendChild(listItem);
         }
     </script>
 </body>
